@@ -14,4 +14,6 @@ import java.util.List;
  */
 public interface AdminMenuDAO extends JpaRepository<AdminMenu,Integer> {
     List<AdminMenu> findAllByParentId(int parentId);
+    AdminMenu findById(int id);
+
 }

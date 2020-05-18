@@ -22,7 +22,7 @@ public class MenuController {
 
     @GetMapping("/api/menu")
     public List<AdminMenu> menu(){
-        System.out.println("接口正常");
-        return adminMenuService.getMenusByCurrentUser();
+        List <AdminMenu> menus =  adminMenuService.getMenusByCurrentUser();
+        return menus;
     }
 }

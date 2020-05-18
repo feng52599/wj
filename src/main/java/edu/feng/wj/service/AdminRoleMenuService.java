@@ -21,7 +21,7 @@ public class AdminRoleMenuService {
     @Autowired
     AdminRoleMenuDAO adminRoleMenuDAO;
 
-    public List<AdminRoleMenu> listAllByRid(List<Integer> rid){
+    public List<AdminRoleMenu> findAllByRid(int rid){
         return adminRoleMenuDAO.findAllByRid(rid);
     }
 }
