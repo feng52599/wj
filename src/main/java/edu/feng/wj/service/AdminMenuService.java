@@ -50,6 +50,7 @@ public class AdminMenuService {
          */
         List<AdminUserRole> userRoleList = adminUserRoleService.listAllByUid(user.getId());
         List<AdminMenu> menus = new ArrayList<>();
+        // userRole 包含多个角色信息，对这些角色信息进行遍历 用这种方式解决了菜单项重复问题，但是在controller层要对父子节点进行重新遍历
         for (AdminUserRole userRole : userRoleList) {
             List<AdminRoleMenu> roleMenuList = adminRoleMenuService.findAllByRid(userRole.getRid());
             for (AdminRoleMenu roleMenu : roleMenuList) {
@@ -57,10 +58,12 @@ public class AdminMenuService {
                 AdminMenu menu = adminMenuDAO.findById(roleMenu.getMid());
                 boolean isExist = false;
                 for (AdminMenu m : menus) {
+                    // 如果菜单重复
                     if (m.getId() == menu.getId()) {
                         isExist = true;
                     }
                 }
+                // 菜单不重复直接添加
                 if (!isExist) {
                     menus.add(menu);
                 }
@@ -106,7 +109,9 @@ public class AdminMenuService {
     //     return menus;
     // }
 
+    // 遗弃
     public void handleMenus(List<AdminMenu> menus) {
+        // 把当前menu的id作为父节点，父节点为该id的所有menu，这就是它的children
         for (AdminMenu menu : menus) {
             List<AdminMenu> children = getAllByParentId(menu.getId());
             menu.setChildren(children);
@@ -114,6 +119,12 @@ public class AdminMenuService {
 
         Iterator<AdminMenu> iterator = menus.iterator();
 
+        // 剔除掉所有子项，只保留第一层的父项。比如 c 是 b 的子项，b 是 a 的子项，我们最后只要保留 a 就行，因为 a 包含了 b 和 c
+        // 只剩下a 但是其他的项都被这个项关联了
+        // 为什么删除子项时用 iterator.remove() 而不用 List 的 remove 方法呢？
+        // 是因为使用 List 遍历时，如果删除了某一个元素，后面的元素会补上来，也就是说后面元素的索引和列表长度都会发生改变。
+        // 而循环仍然继续，循环的次数仍是最初的列表长度，这样既会漏掉一些元素，又会出现下标溢出，
+        // 运行时表现就是会报 ConcurrentModificationException。而 iterator.remove() 进行了一些封装，会把当前索引和循环次数减 1，从而避免了这个问题。
         while (iterator.hasNext()) {
             AdminMenu menu = iterator.next();
             if (menu.getParentId() != 0)
@@ -121,6 +132,7 @@ public class AdminMenuService {
         }
     }
 
+    // 查询出带parentId带所有menu
     public List<AdminMenu> getAllByParentId(int parentId) {
         return adminMenuDAO.findAllByParentId(parentId);
     }

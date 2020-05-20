@@ -3,6 +3,7 @@ package edu.feng.wj.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * @program: wj
@@ -13,10 +14,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "user")
-// 因为是做前后端分离，而前后端数据交互用的是 json 格式。 那么 User 对象就会被转换为 json 数据。 而本项目使用 jpa 来做实体类的持久化，
-// jpa 默认会使用 hibernate, 在 jpa 工作过程中，就会创造代理类来继承 User ，并添加 handler 和 hibernateLazyInitializer 这两个无须 json 化的属性
-// 所以这里需要用 JsonIgnoreProperties 把这两个属性忽略掉。
-@JsonIgnoreProperties({"handler","hibernateLazyInitializer"})
+@JsonIgnoreProperties({"handler", "hibernateLazyInitializer"})
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +24,26 @@ public class User {
     String username;
     String password;
     String salt;
+    String name;
+    String phone;
+    String email;
+    boolean enabled;
+    // 使用这种方法需要在 User 实体类中添加属性来存放角色信息，但是由于数据库中并没有相应定义，所以我们要加上 @Transient 注释。
+    @Transient
+    List<AdminRole> roles;
 
-    public String getSalt() {
-        return salt;
+    // 默认构造函数
+    public User() {
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    // 用于配合自定义查询的构造函数
+    public User(int id, String username, String name, String phone, String email, boolean enabled) {
+        this.id = id;
+        this.username = username;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.enabled = enabled;
     }
 
     public int getId() {
@@ -56,5 +68,54 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public List<AdminRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<AdminRole> roles) {
+        this.roles = roles;
     }
 }

@@ -1,7 +1,7 @@
 package edu.feng.wj.config;
 
 //import edu.feng.parklotback.interceptor.LoginInterceptor;
-import edu.feng.wj.interceptor.LoginInterceptor;
+// import edu.feng.wj.interceptor.LoginInterceptor;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.*;
@@ -9,21 +9,21 @@ import org.springframework.web.servlet.config.annotation.*;
 @SpringBootConfiguration
 public class MyWebConfigurer implements WebMvcConfigurer {
 
-   @Bean
-   public LoginInterceptor getLoginIntercepter() {
-       return new LoginInterceptor();
-   }
+   // @Bean
+   // public LoginInterceptor getLoginIntercepter() {
+   //     return new LoginInterceptor();
+   // }
 //
-   @Override
-   public void addInterceptors(InterceptorRegistry registry) {
-       registry.addInterceptor(getLoginIntercepter())
-               .addPathPatterns("/**")
-               .excludePathPatterns("/index.html")
-               .excludePathPatterns("/api/login")
-               .excludePathPatterns("/api/register")
-               .excludePathPatterns("/api/logout");
-   }
-
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(getLoginIntercepter())
+//                .addPathPatterns("/**")
+//                .excludePathPatterns("/index.html")
+//                .excludePathPatterns("/api/login")
+//                .excludePathPatterns("/api/register")
+//                .excludePathPatterns("/api/logout");
+//    }
+//
 
    // 修改
    @Override
