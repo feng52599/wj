@@ -21,6 +21,8 @@ public class UserService {
     UserDAO userDAO;
     @Autowired
     AdminRoleService adminRoleService;
+    @Autowired
+    AdminUserRoleService adminUserRoleService;
 
     public boolean isExist(String username) {
         User user = getByUsername(username);
@@ -53,6 +55,14 @@ public class UserService {
 
     public void addOrUpdate(User user) {
         userDAO.save(user);
+    }
+
+    public void editUser(User requestUser) {
+        User userInDB = userDAO.findByUsername(requestUser.getUsername());
+        userInDB.setName(requestUser.getName());
+        userInDB.setPhone(requestUser.getPhone());
+        userInDB.setEmail(requestUser.getEmail());
+        adminUserRoleService.saveRoleChanges(userInDB.getId(), requestUser.getRoles());
     }
 }
 

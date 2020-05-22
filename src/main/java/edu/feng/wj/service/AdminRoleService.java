@@ -45,4 +45,12 @@ public class AdminRoleService {
     public List<AdminRole> list() {
         return adminRoleDAO.findAll();
     }
+
+    public AdminRole findById(int id) {
+        return adminRoleDAO.findById(id);
+    }
+
+    public void addOrUpdate(AdminRole adminRole) {
+        adminRoleDAO.save(adminRole);
+    }
 }

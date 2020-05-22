@@ -69,4 +69,6 @@ public class AdminPermissionService {
         }
         return false;
     }
+
+    public List<AdminPermission> list() {return adminPermissionDAO.findAll();}
 }
