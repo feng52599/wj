@@ -79,6 +79,7 @@ public class URLPathMatchingFilter extends PathMatchingFilter {
             // 判断当前用户是否有相应权限
             boolean hasPermission = false;
 
+
             String username = subject.getPrincipal().toString();
             Set<String> permissionAPIs = adminPermissionService.listPermissionURLsByUser(username);
 
