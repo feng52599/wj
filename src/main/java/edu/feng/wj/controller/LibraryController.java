@@ -1,12 +1,15 @@
 package edu.feng.wj.controller;
 
 import edu.feng.wj.pojo.Book;
+import edu.feng.wj.result.Result;
+import edu.feng.wj.result.ResultFactory;
 import edu.feng.wj.service.BookService;
 import edu.feng.wj.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -26,8 +29,20 @@ public class LibraryController {
     // 在MyWebConfigurer.java设置允许所有请求跨域，便可以不用@CrossOrigin
     @GetMapping("/api/books")
 //    @CrossOrigin
-    public List<Book> list() throws Exception {
-        return bookService.list();
+    public Result list() throws Exception {
+        return ResultFactory.buildSuccessResult(bookService.list());
+    }
+
+    @PostMapping("/api/admin/content/books")
+    public Result addOrUpdateBooks(@RequestBody @Valid Book book) {
+        bookService.addOrUpdate(book);
+        return ResultFactory.buildSuccessResult("修改成功");
+    }
+
+    @PostMapping("/api/admin/content/books/delete")
+    public Result deleteBook(@RequestBody @Valid Book book) {
+        bookService.deleteById(book.getId());
+        return ResultFactory.buildSuccessResult("删除成功");
     }
 
     @PostMapping("/api/books")
@@ -46,22 +61,21 @@ public class LibraryController {
 
     @GetMapping("/api/categories/{cid}/books")
 //    @CrossOrigin
-    public List<Book> listByCategory(@PathVariable("cid") int cid) throws Exception {
+    public Result listByCategory(@PathVariable("cid") int cid) throws Exception {
         if (0 != cid) {
-            return bookService.listByCategory(cid);
+            return ResultFactory.buildSuccessResult(bookService.listByCategory(cid));
         } else {
-            return list();
+            return ResultFactory.buildSuccessResult(bookService.list());
         }
     }
 
-    @CrossOrigin
     @GetMapping("/api/search")
-    public List<Book> searchResult(@RequestParam("keywords") String keywords) {
-        // 关键词为空时查询出所有书籍
+    public Result searchResult(@RequestParam("keywords") String keywords) {
+        // 关键词为空返回所有书
         if ("".equals(keywords)) {
-            return bookService.list();
+            return ResultFactory.buildSuccessResult(bookService.list());
         } else {
-            return bookService.Search(keywords);
+            return ResultFactory.buildSuccessResult(bookService.Search(keywords));
         }
     }
 

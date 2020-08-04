@@ -20,6 +20,17 @@ public class AdminRole {
     @Transient
     List<AdminPermission> perms;
 
+    @Transient
+    List<AdminMenu> menus;
+
+    public List<AdminMenu> getMenus() {
+        return menus;
+    }
+
+    public void setMenus(List<AdminMenu> menus) {
+        this.menus = menus;
+    }
+
     public int getId() {
         return id;
     }

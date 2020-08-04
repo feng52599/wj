@@ -1,6 +1,7 @@
 package edu.feng.wj.service;
 
 import edu.feng.wj.dao.AdminPermissionDAO;
+import edu.feng.wj.dao.AdminRoleDAO;
 import edu.feng.wj.dao.AdminRolePermissionDAO;
 import edu.feng.wj.pojo.AdminPermission;
 import edu.feng.wj.pojo.AdminRole;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,7 +35,8 @@ public class AdminPermissionService {
     AdminRoleService adminRoleService;
 
     @Autowired
-    AdminRolePermissionDAO adminRolePermissionDAO;
+    AdminRolePermissionService adminRolePermissionService;
+
 
     /**
      * <=> List<AdminRole> Roles =  listRolesByUser(username));
@@ -42,16 +47,28 @@ public class AdminPermissionService {
      * 相当于把获取的集合 的类进行getid
      */
     public Set<String> listPermissionURLsByUser(String username) {
-        // 获取用户对应所有的角色id
-        List<Integer> rids = adminRoleService.listRolesByUser(username).stream().map(AdminRole::getId).collect(Collectors.toList());
+        // // 获取用户对应所有的角色id
+        // List<Integer> rids = adminRoleService.listRolesByUser(username).stream().map(AdminRole::getId).collect(Collectors.toList());
+        //
+        // // 通过中间表 以rid 获取所有pid
+        // List<Integer> pids = adminRolePermissionDAO.findAllByRid(rids).stream().map(AdminRolePermission::getPid).collect(Collectors.toList());
+        //
+        // List<AdminPermission> perms = adminPermissionDAO.findAllById(pids);
+        //
+        // Set<String> URLs = perms.stream().map(AdminPermission::getUrl).collect(Collectors.toSet());
+        //
+        // return URLs;
 
-        // 通过中间表 以rid 获取所有pid
-        List<Integer> pids = adminRolePermissionDAO.findAllByRid(rids).stream().map(AdminRolePermission::getPid).collect(Collectors.toList());
 
-        List<AdminPermission> perms = adminPermissionDAO.findAllById(pids);
+        List<AdminRole> roles = adminRoleService.listRolesByUser(username);
+        Set<String> URLs = new HashSet<>();
 
-        Set<String> URLs = perms.stream().map(AdminPermission::getUrl).collect(Collectors.toSet());
-
+        for (AdminRole role : roles) {
+            List<AdminRolePermission> rps = adminRolePermissionService.findAllByRid(role.getId());
+            for (AdminRolePermission rp : rps) {
+                URLs.add(adminPermissionDAO.findById(rp.getPid()).getUrl());
+            }
+        }
         return URLs;
     }
 
@@ -71,4 +88,14 @@ public class AdminPermissionService {
     }
 
     public List<AdminPermission> list() {return adminPermissionDAO.findAll();}
+
+    public List<AdminPermission> listPermissionByRoleId(int id) {
+        List<AdminRolePermission> rps = adminRolePermissionService.findAllByRid(id);
+        List<AdminPermission> perms = new ArrayList<>();
+        for (AdminRolePermission rp : rps){
+            perms.add(adminPermissionDAO.findById(rp.getPid()));
+        }
+
+        return perms;
+    }
 }

@@ -109,7 +109,7 @@ public class AdminMenuService {
     //     return menus;
     // }
 
-    // 遗弃
+    // 遗弃, 后在查询角色的menu里使用
     public void handleMenus(List<AdminMenu> menus) {
         // 把当前menu的id作为父节点，父节点为该id的所有menu，这就是它的children
         for (AdminMenu menu : menus) {
@@ -137,4 +137,24 @@ public class AdminMenuService {
         return adminMenuDAO.findAllByParentId(parentId);
     }
 
+    public List<AdminMenu> getMenusByRoleId(int i) {
+        List<Integer> menuIds = adminRoleMenuService.findAllByRid(i).stream().map(AdminRoleMenu::getMid).collect(Collectors.toList());
+
+        System.out.println("menu是否为空"+menuIds.isEmpty());
+
+        List<AdminMenu> menus = adminMenuDAO.findAllById(menuIds);
+
+        handleMenus(menus);
+        return menus;
+    }
+
+    public List<AdminMenu> listMenusByRoleId(int rid) {
+        List<AdminMenu> menus = new ArrayList<>();
+        List<AdminRoleMenu> rms = adminRoleMenuService.findAllByRid(rid);
+        for (AdminRoleMenu rm : rms) {
+            menus.add(adminMenuDAO.findById(rm.getMid()));
+        }
+        handleMenus(menus);
+        return menus;
+    }
 }

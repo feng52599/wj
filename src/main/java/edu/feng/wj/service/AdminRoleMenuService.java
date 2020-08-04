@@ -3,6 +3,7 @@ package edu.feng.wj.service;
 import edu.feng.wj.dao.AdminRoleMenuDAO;
 import edu.feng.wj.pojo.AdminRoleMenu;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +24,16 @@ public class AdminRoleMenuService {
 
     public List<AdminRoleMenu> findAllByRid(int rid){
         return adminRoleMenuDAO.findAllByRid(rid);
+    }
+
+
+    @Modifying
+    @Transactional
+    public void deleteAllByRid(int rid) {
+        adminRoleMenuDAO.deleteAllByRid(rid);
+    }
+
+    public void save(AdminRoleMenu rm) {
+        adminRoleMenuDAO.save(rm);
     }
 }

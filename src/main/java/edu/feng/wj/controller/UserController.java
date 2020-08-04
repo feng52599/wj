@@ -1,19 +1,16 @@
 package edu.feng.wj.controller;
 
-import edu.feng.wj.pojo.AdminPermission;
-import edu.feng.wj.pojo.AdminRole;
-import edu.feng.wj.pojo.User;
+import edu.feng.wj.pojo.*;
 import edu.feng.wj.result.Result;
 import edu.feng.wj.result.ResultFactory;
-import edu.feng.wj.service.AdminPermissionService;
-import edu.feng.wj.service.AdminRoleService;
-import edu.feng.wj.service.UserService;
+import edu.feng.wj.service.*;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -31,6 +28,12 @@ public class UserController {
     AdminPermissionService adminPermissionService;
     @Autowired
     AdminRoleService adminRoleService;
+    @Autowired
+    AdminMenuService adminMenuService;
+    @Autowired
+    AdminRolePermissionService adminRolePermissionService;
+    @Autowired
+    AdminRoleMenuService adminRoleMenuService;
 
     @RequiresPermissions("/api/admin/user")
     @GetMapping("/api/admin/user")
@@ -109,6 +112,34 @@ public class UserController {
         adminRoleService.addOrUpdate(adminRole);
         String message = "角色" + requestRole.getName() + "状态更新成功";
         return ResultFactory.buildSuccessResult(message);
+    }
+
+    @GetMapping("api/admin/role/menu")
+    public List<AdminMenu> getMenu() {
+        List<AdminMenu> menus = adminMenuService.getMenusByRoleId(1);
+        return menus;
+    }
+
+    @PutMapping("api/admin/role")
+    public Result editRole(@RequestBody AdminRole role) {
+        adminRoleService.addOrUpdate(role);
+        adminRolePermissionService.savePermChanges(role.getId(), role.getPerms());
+
+        String message = "修改角色信息成功";
+        return ResultFactory.buildSuccessResult(message);
+    }
+
+    @PutMapping("/api/admin/role/menu")
+    public void updateRoleMenu(@RequestParam int rid, @RequestBody LinkedHashMap menusIds) {
+        adminRoleMenuService.deleteAllByRid(rid);
+        for (Object value : menusIds.values()) {
+            for (int mid : (List<Integer>)value) {
+                AdminRoleMenu rm = new AdminRoleMenu();
+                rm.setRid(rid);
+                rm.setMid(mid);
+                adminRoleMenuService.save(rm);
+            }
+        }
     }
 
 }
